@@ -51,7 +51,7 @@ class YoutubePlaylistRepository extends YoutubeRepository {
                 createdAt: item.snippet.publishedAt,
                 channelId: item.snippet.channelId,
                 title: item.snippet.title,
-                image: item.snippet.thumbnails.medium.url
+                image: item.snippet.thumbnails ? item.snippet.thumbnails.medium.url : `https://cataas.com/c/s/${item.snippet.title}?w=400`
             };
         }));
     }

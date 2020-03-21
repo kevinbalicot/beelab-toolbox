@@ -42,7 +42,7 @@ class YoutubeSearchRepository extends YoutubeRepository {
 
     searchPlaylistVideos(term, options = {}) {
         return this.searchPlaylist(term, options).then(playlists => {
-            return Promise.all(playlists.map(({ id }) => this.searchPlaylistVideosById(id))).then(playlistItems => {
+            return Promise.all(playlists.map(({ id }) => this.searchPlaylistVideosById(id, options))).then(playlistItems => {
                 return playlistItems.map((items, index) => Object.assign(playlists[index], { items }));
             });
         });
@@ -77,7 +77,7 @@ class YoutubeSearchRepository extends YoutubeRepository {
             return {
                 id: item.id.videoId || item.id.playlistId,
                 title: item.snippet.title,
-                image: item.snippet.thumbnails.medium.url,
+                image: item.snippet.thumbnails ? item.snippet.thumbnails.medium.url : `https://cataas.com/c/s/${item.snippet.title}?w=400`,
                 createdAt: item.snippet.publishedAt,
                 channelId: item.snippet.channelId,
             };
