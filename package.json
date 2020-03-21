@@ -1,0 +1,22 @@
+{
+  "name": "@beelab/toolbox",
+  "version": "0.1.0",
+  "description": "Toolbox for beelab projects",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.beelab.tk:beelab/toolbox.git"
+  },
+  "keywords": [
+    "Toolbox",
+    "utils"
+  ],
+  "author": "Kevin Balicot <kevinbalicot@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "mongodb": "^3.5.5"
+  }
+}
