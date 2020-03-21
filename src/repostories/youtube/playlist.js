@@ -26,7 +26,7 @@ class YoutubePlaylistRepository extends YoutubeRepository {
 
     searchVideosById(id, options = {}) {
         const maxResults = options.maxResults || 10;
-        const key = `videos-${id}`;
+        const key = `videos-${id}-${maxResults}`;
         const url = `${this.url}/playlistItems?playlistId=${id}&key=${this.secret}&maxResults=${maxResults}&part=snippet,contentDetails`;
 
         return this.get(key)
@@ -34,7 +34,7 @@ class YoutubePlaylistRepository extends YoutubeRepository {
                 if (!query.result) {
                     return request(url)
                         .then(response => this._parseResponse(response, 'playlistItem'))
-                        .then(items => this._mapPlaylistItem(items[0]))
+                        .then(items => this._mapPlaylistItems(items))
                         .then(item => this.set(key, item))
                     ;
                 }
@@ -47,24 +47,13 @@ class YoutubePlaylistRepository extends YoutubeRepository {
     _mapPlaylistItems(items) {
         return Promise.resolve(items.map(item => {
             return {
-                id: item.id,
+                id: item.snippet.resourceId.videoId,
                 createdAt: item.snippet.publishedAt,
                 channelId: item.snippet.channelId,
                 title: item.snippet.title,
-                image: item.snippet.thumbnails.medium.url,
-                count: item.contentDetails.itemCount
+                image: item.snippet.thumbnails.medium.url
             };
         }));
-    }
-
-    _mapPlaylistItem(item) {
-        return Promise.resolve({
-            id: item.snippet.resourceId.videoId,
-            createdAt: item.snippet.publishedAt,
-            channelId: item.snippet.channelId,
-            title: item.snippet.title,
-            image: item.snippet.thumbnails.medium.url,
-        });
     }
 }
 

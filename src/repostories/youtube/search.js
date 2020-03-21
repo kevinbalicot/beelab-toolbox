@@ -41,15 +41,19 @@ class YoutubeSearchRepository extends YoutubeRepository {
     }
 
     searchPlaylistVideos(term, options = {}) {
-        return this.searchPlaylist(term, options).then(playlists => Promise.all(playlists.map(({ id }) => this.searchPlaylistVideosById(id))));
+        return this.searchPlaylist(term, options).then(playlists => {
+            return Promise.all(playlists.map(({ id }) => this.searchPlaylistVideosById(id))).then(playlistItems => {
+                return playlistItems.map((items, index) => Object.assign(playlists[index], { items }));
+            });
+        });
     }
 
     searchVideoById(id) {
         return this.videoRepository.searchById(id);
     }
 
-    searchPlaylistVideosById(id) {
-        return this.playlistRepository.searchVideosById(id);
+    searchPlaylistVideosById(id, options = {}) {
+        return this.playlistRepository.searchVideosById(id, options);
     }
 
     _search(url, type, cacheKey) {
