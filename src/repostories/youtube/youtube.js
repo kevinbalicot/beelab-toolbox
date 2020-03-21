@@ -27,8 +27,6 @@ class YoutubeRepository extends CacheRepository {
                     return reject(data.error);
                 }
 
-                console.log(data);
-
                 let items = [];
                 if (data.items) {
                     items = data.items.filter(item => filters[type](item));
