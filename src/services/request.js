@@ -8,7 +8,7 @@ module.exports = (uri, options = {}, body = null) => {
         const opts = Object.assign({
             hostname: parsedUrl.hostname,
             port: parsedUrl.port,
-            path: parsedUrl.pathname + parsedUrl.search
+            path: parsedUrl.pathname + (parsedUrl.search ? parsedUrl.search : ''),
         }, options);
 
         const callback = (res) => {
