@@ -3,8 +3,9 @@ const MongoObjectID = require("mongodb").ObjectID;
 
 class Requester {
     /**
-     * @param {Object} db
-     * @param {boolean} [userCache=false]
+     * @param {string} uri
+     * @param {string} dbname
+     * @param {boolean} [useCache=false]
      */
     constructor(uri, dbname, useCache = false) {
         this.uri = uri;
@@ -38,15 +39,16 @@ class Requester {
      * @param {MongoClient} client
      * @param {string} collection
      * @param {Object} params
-     * @param {number} [limit=100]
+     * @param {Object} options
      * @param {number} [skip=0]
+     * @param {number} [limit=100]
      * @param {Object} [sort=null]
      *
      * @return {Promise}
      */
     find(client, collection, params, options = {}, skip = 0, limit = 100, sort = null) {
         const id = `${collection}.find.${JSON.stringify(params)}.${JSON.stringify(options)}.${skip}.${limit}.${JSON.stringify(sort)}`;
-        const query = { id, type: 'find', cached: false, result: null };
+        const query = { id, collection, type: 'find', cached: false, result: null };
 
         return new Promise((resolve, reject) => {
             const queryFromCache = this.fromCache(id);
@@ -77,12 +79,13 @@ class Requester {
      * @param {MongoClient} client
      * @param {string} collection
      * @param {Object} params
+     * @param {Object} options
      *
      * @return {Promise}
      */
     findOne(client, collection, params, options = {}) {
         const id = `${collection}.findOne.${JSON.stringify(params)}.${JSON.stringify(options)}`;
-        const query = { id, type: 'findOne', cached: false, result: null };
+        const query = { id, collection, type: 'findOne', cached: false, result: null };
 
         return new Promise((resolve, reject) => {
             const queryFromCache = this.fromCache(id);
@@ -124,7 +127,7 @@ class Requester {
      */
     insert(client, collection, params, options = null) {
         const id = `${collection}.insert.${JSON.stringify(params)}.${JSON.stringify(options)}`;
-        const query = { id, type: 'insert', cached: false, result: null };
+        const query = { id, collection, type: 'insert', cached: false, result: null };
 
         return new Promise((resolve, reject) => {
             client.db(this.dbname).collection(collection).insertOne(params, options, (error, response) => {
@@ -154,7 +157,7 @@ class Requester {
      */
     insertMany(client, collection, docs, options = null) {
         const id = `${collection}.insert.${JSON.stringify(docs)}.${JSON.stringify(options)}`;
-        const query = { id, type: 'insertMany', cached: false, result: null };
+        const query = { id, collection, type: 'insertMany', cached: false, result: null };
 
         return new Promise((resolve, reject) => {
             client.db(this.dbname).collection(collection).insertMany(docs, options, (error, response) => {
@@ -184,7 +187,7 @@ class Requester {
      */
     remove(client, collection, selector, options = null) {
         const id = `${collection}.remove.${JSON.stringify(selector)}.${JSON.stringify(options)}`;
-        const query = { id, type: 'remove', cached: false, result: null };
+        const query = { id, collection, type: 'remove', cached: false, result: null };
 
         return new Promise((resolve, reject) => {
             if (!!selector.id || !!selector._id ) {
@@ -219,7 +222,7 @@ class Requester {
      */
     removeMany(client, collection, selector, options = null) {
         const id = `${collection}.remove.${JSON.stringify(selector)}.${JSON.stringify(options)}`;
-        const query = { id, type: 'removeMany', cached: false, result: null };
+        const query = { id, collection, type: 'removeMany', cached: false, result: null };
 
         return new Promise((resolve, reject) => {
             if (!!selector.id || !!selector._id ) {
@@ -255,7 +258,7 @@ class Requester {
      */
     update(client, collection, selector, params, options = null) {
         const id = `${collection}.update.${JSON.stringify(selector)}.${JSON.stringify(params)}.${JSON.stringify(options)}`;
-        const query = { id, type: 'update', cached: false, result: null };
+        const query = { id, collection, type: 'update', cached: false, result: null };
 
         return new Promise((resolve, reject) => {
             if (!!selector.id || !!selector._id ) {
@@ -291,7 +294,7 @@ class Requester {
      */
     updateMany(client, collection, selector, params, options = null) {
         const id = `${collection}.update.${JSON.stringify(selector)}.${JSON.stringify(params)}.${JSON.stringify(options)}`;
-        const query = { id, type: 'updateMany', cached: false, result: null };
+        const query = { id, collection, type: 'updateMany', cached: false, result: null };
 
         return new Promise((resolve, reject) => {
             if (!!selector.id || !!selector._id ) {
@@ -326,7 +329,7 @@ class Requester {
      */
     aggregate(client, collection, params, options = null) {
         const id = `${collection}.aggregate.${JSON.stringify(params)}.${JSON.stringify(options)}`;
-        const query = { id, type: 'aggregate', cached: false, result: null };
+        const query = { id, collection, type: 'aggregate', cached: false, result: null };
 
         return new Promise((resolve, reject) => {
             const queryFromCache = this.fromCache(id);
@@ -381,7 +384,7 @@ class Requester {
      */
     distinct(client, collection, field, params = {}, options = null) {
         const id = `${collection}.distinct.${field}.${JSON.stringify(params)}.${JSON.stringify(options)}`;
-        const query = { id, type: 'distinct', cached: false, result: null };
+        const query = { id, collection, type: 'distinct', cached: false, result: null };
 
         return new Promise((resolve, reject) => {
             const queryFromCache = this.fromCache(id);
@@ -418,7 +421,7 @@ class Requester {
      */
     count(client, collection, params = {}, options = null) {
         const id = `${collection}.count.${JSON.stringify(params)}.${JSON.stringify(options)}`;
-        const query = { id, type: 'count', cached: false, result: null };
+        const query = { id, collection, type: 'count', cached: false, result: null };
 
         return new Promise((resolve, reject) => {
             const queryFromCache = this.fromCache(id);
@@ -446,21 +449,21 @@ class Requester {
 
     /**
      * Run query
-     * @param {Object} params
+     * @param {Object} query
      *
      * @return {Promise}
      */
     query({
-          collection,
-          params,
-          type,
-          limit,
-          skip,
-          sort,
-          options,
-          selector,
-          field
-      }) {
+        collection,
+        params,
+        type,
+        limit,
+        skip,
+        sort,
+        options,
+        selector,
+        field
+    }) {
         if (type === 'find') {
             return this.connect().then(client => this.find(client, collection, params, options, skip, limit, sort));
         } else if (type === 'findOne') {
@@ -488,6 +491,11 @@ class Requester {
         return Promise.reject('Query type is undefined.');
     }
 
+    /**
+     * @param {String} [collection=null]
+     *
+     * @returns {[]}
+     */
     clearCache(collection = null) {
         if (null === collection) {
             return this.storedQueries = [];
@@ -496,10 +504,17 @@ class Requester {
         this.storedQueries = this.storedQueries.filter(q => q.collection !== collection);
     }
 
+    /**
+     * @param {String} id
+     * @returns {*}
+     */
     fromCache(id) {
         return this.storedQueries.find(q => q.id === id);
     }
 
+    /**
+     * @param {Object} query
+     */
     cache(query) {
         if (this.useCache) {
             query.cached = true;
@@ -507,6 +522,11 @@ class Requester {
         }
     }
 
+    /**
+     * @param {Object} response
+     * @returns {Object}
+     * @private
+     */
     _parseResponse(response) {
         const {
             insertedCount,
