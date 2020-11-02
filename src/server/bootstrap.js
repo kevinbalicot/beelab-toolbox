@@ -24,6 +24,7 @@ module.exports = (app, options = { cache: true }) => {
     app.link('/dist', basePath + '/dist', options.cache ? cache : {});
     app.link('/style', basePath + '/public/styles', options.cache ? cache : {});
     app.link('/images', basePath + '/public/images', options.cache ? cache : {});
+    app.link('/fonts', basePath + '/public/fonts', options.cache ? cache : {});
 
     app.get('/info', (req, res) => {
         const { version, name } = require(`${basePath}/package.json`);
