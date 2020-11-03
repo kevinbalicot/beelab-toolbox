@@ -12,7 +12,7 @@ module.exports = (app, options = { cache: true }) => {
     if (options.cache) {
         // validate cache
         app.use((req, res, next) => {
-            if (req.headers['if-none-match'] && req.headers['if-none-match'] === cache['ETag']) {
+            if (req.headers['if-none-match'] && req.headers['if-none-match'] == cache['ETag']) {
                 return res.status(304).send();
             }
 
@@ -23,6 +23,7 @@ module.exports = (app, options = { cache: true }) => {
     app.link('/modules', basePath + '/node_modules', options.cache ? cache : {});
     app.link('/dist', basePath + '/dist', options.cache ? cache : {});
     app.link('/style', basePath + '/public/styles', options.cache ? cache : {});
+    app.link('/scripts', basePath + '/public/scripts', options.cache ? cache : {});
     app.link('/images', basePath + '/public/images', options.cache ? cache : {});
     app.link('/fonts', basePath + '/public/fonts', options.cache ? cache : {});
 
