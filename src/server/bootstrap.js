@@ -1,7 +1,7 @@
 const fs = require('fs');
 const request = require('../services/request');
 
-module.exports = (app, options = { cache: true }) => {
+module.exports = (app, options = { cache: true, websocket: false, pwa: true }) => {
     const { NODE_ENV = 'dev', LOCALE = 'en', API_URL, ALLOW_ANONYMOUS, WEBSOCKET_URL } = process.env;
     const basePath = process.cwd();
     const cache = {
@@ -15,6 +15,14 @@ module.exports = (app, options = { cache: true }) => {
             if (req.headers['if-none-match'] && req.headers['if-none-match'] == cache['ETag']) {
                 return res.status(304).send();
             }
+
+            next();
+        });
+    }
+
+    if (options.pwa) {
+        app.use((req, res, next) => {
+            res.set('Service-Worker-Allowed', '/');
 
             next();
         });
