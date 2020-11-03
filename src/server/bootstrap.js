@@ -31,6 +31,7 @@ module.exports = (app, options = { cache: true, websocket: false, pwa: true }) =
     app.link('/modules', basePath + '/node_modules', options.cache ? cache : {});
     app.link('/dist', basePath + '/dist', options.cache ? cache : {});
     app.link('/style', basePath + '/public/styles', options.cache ? cache : {});
+    app.link('/static', basePath + '/public/static', options.cache ? cache : {});
     app.link('/scripts', basePath + '/public/scripts', options.cache ? cache : {});
     app.link('/images', basePath + '/public/images', options.cache ? cache : {});
     app.link('/fonts', basePath + '/public/fonts', options.cache ? cache : {});
