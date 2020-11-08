@@ -26,6 +26,18 @@ module.exports = (app, options = { cache: true, websocket: false, pwa: true }) =
 
             next();
         });
+
+        app.get('/sw.js', (req, res) => {
+            res.set('Content-Type', 'application/javascript');
+
+            return res.send(`
+                importScripts('/scripts/sw.js');
+
+                if (initServiceWorker) {
+                    initServiceWorker(self, "${cache['ETag']}");
+                }
+            `);
+        });
     }
 
     app.link('/modules', basePath + '/node_modules', options.cache ? cache : {});
