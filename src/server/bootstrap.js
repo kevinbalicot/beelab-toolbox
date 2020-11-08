@@ -1,8 +1,8 @@
 const fs = require('fs');
 const request = require('../services/request');
 
-module.exports = (app, options = { cache: true, websocket: false, pwa: true }) => {
-    const { NODE_ENV = 'dev', LOCALE = 'en', API_URL, ALLOW_ANONYMOUS, WEBSOCKET_URL } = process.env;
+module.exports = (app, options = { cache: true, websocket: false, pwa: false }) => {
+    const { NODE_ENV = 'dev', LOCALE = 'en', API_URL, WEBSOCKET_URL } = process.env;
     const basePath = process.cwd();
     const cache = {
         'Cache-Control': 'public, max-age=' + (86400 * 30),
@@ -50,7 +50,7 @@ module.exports = (app, options = { cache: true, websocket: false, pwa: true }) =
 
     app.get('/info', (req, res) => {
         const { version, name } = require(`${basePath}/package.json`);
-        const config = { locale: LOCALE, env: NODE_ENV, allowAnonymous: !!ALLOW_ANONYMOUS };
+        const config = { locale: LOCALE, env: NODE_ENV, allowAnonymous: true };
 
         if (API_URL) {
             config['api'] = API_URL;
@@ -60,8 +60,9 @@ module.exports = (app, options = { cache: true, websocket: false, pwa: true }) =
             config['websocketUrl'] = WEBSOCKET_URL;
         }
 
-        request(`https://back.beelab.tk/configuration/${name}`, { headers: { 'User-Agent': req.userAgent } })
-            .then(data => res.json(Object.assign(config, { version, name }, JSON.parse(data))));
+        request(`https://crudaas.beelab.tk/configuration/${name}`, { headers: { 'User-Agent': req.userAgent } })
+            .then(data => res.json(Object.assign(config, { version, name }, JSON.parse(data))))
+            .catch(() => res.json(Object.assign(config, { version, name }, { auth: { clientId: 'demo' }})));
     });
 
     app.get('/', (req, res) => {
