@@ -4,6 +4,7 @@ const request = require('../services/request');
 module.exports = (app, options = { cache: true, websocket: false, pwa: false }) => {
     const { NODE_ENV = 'dev', LOCALE = 'en', API_URL, WEBSOCKET_URL } = process.env;
     const basePath = process.cwd();
+    const { version, name } = require(`${basePath}/package.json`);
     const cache = {
         'Cache-Control': 'public, max-age=' + (86400 * 30),
         'ETag': Date.now()
@@ -12,7 +13,7 @@ module.exports = (app, options = { cache: true, websocket: false, pwa: false }) 
     if (options.cache) {
         // validate cache
         app.use((req, res, next) => {
-            if (req.headers['if-none-match'] && req.headers['if-none-match'] == cache['ETag']) {
+            if (req.headers['if-none-match'] && req.headers['if-none-match'] === cache['ETag']) {
                 return res.status(304).send();
             }
 
@@ -34,7 +35,7 @@ module.exports = (app, options = { cache: true, websocket: false, pwa: false }) 
                 importScripts('/scripts/sw.js');
 
                 if (initServiceWorker) {
-                    initServiceWorker(self, "${cache['ETag']}");
+                    initServiceWorker(self, "${name}-${version}");
                 }
             `);
         });
@@ -49,7 +50,6 @@ module.exports = (app, options = { cache: true, websocket: false, pwa: false }) 
     app.link('/fonts', basePath + '/public/fonts', options.cache ? cache : {});
 
     app.get('/info', (req, res) => {
-        const { version, name } = require(`${basePath}/package.json`);
         const config = { locale: LOCALE, env: NODE_ENV, allowAnonymous: true };
 
         if (API_URL) {
