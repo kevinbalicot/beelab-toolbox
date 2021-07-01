@@ -1,6 +1,6 @@
 {
   "name": "@beelab/toolbox",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Toolbox for beelab projects",
   "main": "index.js",
   "scripts": {
