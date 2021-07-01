@@ -341,7 +341,7 @@ class Requester {
 
             // because mongoclient driver have bug at lib/collection#2582
             if (null === options) {
-                client.db(this.dbname).collection(collection).aggregate(params, (error, results) => {
+                client.db(this.dbname).collection(collection).aggregate(params).toArray((error, results) => {
                     if (!!error) {
                         client.close();
                         return reject(error);
@@ -355,7 +355,7 @@ class Requester {
                     return resolve(query);
                 });
             } else {
-                client.db(this.dbname).collection(collection).aggregate(params, options, (error, results) => {
+                client.db(this.dbname).collection(collection).aggregate(params, options).toArray((error, results) => {
                     if (!!error) {
                         client.close();
                         return reject(error);
