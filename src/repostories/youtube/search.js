@@ -75,7 +75,7 @@ class YoutubeSearchRepository extends YoutubeRepository {
     _mapSearchItems(items) {
         return Promise.resolve(items.map(item => {
             return {
-                id: item.id.videoId || item.id.playlistId,
+                id: item.id.videoId || item.id.playlistId,
                 title: item.snippet.title,
                 image: item.snippet.thumbnails ? item.snippet.thumbnails.medium.url : `https://cataas.com/c/s/${item.snippet.title}?w=400`,
                 createdAt: item.snippet.publishedAt,

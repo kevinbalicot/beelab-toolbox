@@ -15,8 +15,5 @@
     "utils"
   ],
   "author": "Kevin Balicot <kevinbalicot@gmail.com>",
-  "license": "MIT",
-  "dependencies": {
-    "mongodb": "^3.5.5"
-  }
+  "license": "MIT"
 }

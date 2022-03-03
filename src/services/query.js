@@ -1,5 +1,4 @@
-const MongoClient = require('mongodb').MongoClient;
-const MongoObjectID = require("mongodb").ObjectID;
+const { MongoClient, MongoObjectID } = require.main.require('mongodb');
 
 class Requester {
     /**

@@ -1,7 +1,7 @@
 const request = require('./../../services/request');
 const YoutubeRepository = require('./youtube');
 
-class YoutubeVideoRepository extends YoutubeRepository {
+class YoutubeVideoRepository extends YoutubeRepository {
     constructor(keys, query) {
         super(keys, query, 'youtube-video');
     }
