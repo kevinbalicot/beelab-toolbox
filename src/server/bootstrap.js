@@ -102,8 +102,8 @@ module.exports = (app, options = {
     });
 
     if (options.api) {
-        const tamiaApi = require.main.require('@tamia/tamia/src');
-        const docPlugin = require.main.require('@tamia/doc-plugin');
+        const tamiaApi = require.main.require('@tamia-web/tamia');
+        const docPlugin = require.main.require('@tamia-web/doc-plugin');
 
         const apiMiddleware = tamiaApi(options.api, { plugins: [docPlugin] });
 
@@ -114,7 +114,7 @@ module.exports = (app, options = {
                 req.original.params = req.params;
                 req.original.query = req.query;
                 req.original.requester = app.requester;
-                apiMiddleware(req.original, res.original, next);
+                apiMiddleware.request(req.original, res.original, next);
             } else {
                 next();
             }
