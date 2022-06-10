@@ -1,12 +1,12 @@
 const fs = require('fs');
 const request = require('../services/request');
-const Requester = require('../services/query');
 
 module.exports = (app, options = {
     cache: true,
     websocket: false,
     pwa: false,
     query: false,
+    localQuery: false,
     api: false,
     cors: null,
     publicDir: 'public'
@@ -21,6 +21,8 @@ module.exports = (app, options = {
     };
 
     if (options.query) {
+        const Requester = require('../services/query');
+
         app.use((req, res, next) => {
             if (!app.requester) {
                 const { DB_HOST, DB_NAME, DB_CACHE = false } = process.env;
