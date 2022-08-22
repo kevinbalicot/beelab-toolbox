@@ -1,7 +1,7 @@
-const request = require('./../../services/request');
-const YoutubeRepository = require('./youtube');
-const YoutubeVideoRepository = require('./video');
-const YoutubePlaylistRepository = require('./playlist');
+const Request = require('../../Common/Service/Request');
+const YoutubeRepository = require('./Youtube');
+const YoutubeVideoRepository = require('./Video');
+const YoutubePlaylistRepository = require('./Playlist');
 
 class YoutubeSearchRepository extends YoutubeRepository {
     constructor(keys, query) {
@@ -60,7 +60,7 @@ class YoutubeSearchRepository extends YoutubeRepository {
         return this.get(cacheKey)
             .then(query => {
                 if (!query.result) {
-                    return request(url)
+                    return Request.get(url)
                         .then(response => this._parseResponse(response, type))
                         .then(items => this._mapSearchItems(items))
                         .then(items => this.set(cacheKey, items))

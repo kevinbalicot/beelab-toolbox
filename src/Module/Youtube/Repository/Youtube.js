@@ -1,4 +1,4 @@
-const CacheRepository = require('./../cache');
+const CacheRepository = require('./Cache');
 
 class YoutubeRepository extends CacheRepository {
     constructor(keys, db, cacheCollection) {

@@ -1,7 +1,11 @@
-const fs = require('fs');
-const request = require('../services/request');
+require('dotenv').config();
 
-module.exports = (app, options = {
+const fs = require('fs');
+const { createApp, createServer } = require('yion');
+const bodyParser = require('yion-body-parser');
+const Container = require('../Common/Service/Container');
+
+module.exports = (options = {
     cache: true,
     websocket: false,
     pwa: false,
@@ -9,24 +13,54 @@ module.exports = (app, options = {
     localQuery: false,
     api: false,
     cors: null,
-    publicDir: 'public'
+    publicDir: 'public',
+    auth: { clientId: 'demo' },
+    httpServerPlugins: [],
 }) => {
-    const { NODE_ENV = 'dev', LOCALE = 'en', API_URL, WEBSOCKET_URL } = process.env;
     const basePath = process.cwd();
-    const publicDir = options.publicDir || 'public';
+    const publicDir = options.publicDir ? options.publicDir : 'public';
+    const { NODE_PORT = 8080, NODE_ENV = 'dev', LOCALE = 'en', ALLOW_ANONYMOUS = true, API_URL, WEBSOCKET_URL } = process.env;
     const { version, name } = require(`${basePath}/package.json`);
     const cache = {
         'Cache-Control': 'public, max-age=' + (86400 * 30),
         'ETag': Date.now()
     };
 
+    Container.addParameters({
+        info: {
+            name,
+            version,
+            env: NODE_ENV,
+            locale: LOCALE,
+            allowAnonymous: ALLOW_ANONYMOUS,
+            apiUrl: API_URL,
+            websocketUrl: WEBSOCKET_URL,
+            auth: options.auth,
+        }
+    });
+
+    const app = createApp();
+
     if (options.query) {
-        const Requester = require('../services/query');
+        const Query = require('../Common/Service/Query');
 
         app.use((req, res, next) => {
-            if (!app.requester) {
+            if (!Container.has('Requester')) {
                 const { DB_HOST, DB_NAME, DB_CACHE = false } = process.env;
-                app.requester = new Requester(DB_HOST, DB_NAME, !!DB_CACHE);
+                Container.set('Requester', new Query(DB_HOST, DB_NAME, !!DB_CACHE));
+            }
+
+            next();
+        });
+    }
+
+    if (options.localQuery) {
+        const LocalQuery = require('../Common/Service/LocalQuery');
+
+        app.use((req, res, next) => {
+            if (!Container.has('Requester')) {
+                const { DB_CACHE = false } = process.env;
+                Container.set('Requester', new LocalQuery(options.localQuery, !!DB_CACHE));
             }
 
             next();
@@ -48,7 +82,6 @@ module.exports = (app, options = {
     }
 
     if (options.cache) {
-        // validate cache
         app.use((req, res, next) => {
             if (req.headers['if-none-match'] && req.headers['if-none-match'] === cache['ETag']) {
                 return res.status(304).send();
@@ -80,7 +113,7 @@ module.exports = (app, options = {
 
     app.link('/modules', `${basePath}/node_modules`, options.cache ? cache : {});
     app.link('/dist', basePath + '/dist', options.cache ? cache : {});
-    app.link('/style', `${basePath}/${publicDir}/styles`, options.cache ? cache : {});
+    app.link('/styles', `${basePath}/${publicDir}/styles`, options.cache ? cache : {});
     app.link('/static', `${basePath}/${publicDir}/static`, options.cache ? cache : {});
     app.link('/scripts', `${basePath}/${publicDir}/scripts`, options.cache ? cache : {});
     app.link('/images', `${basePath}/${publicDir}/images`, options.cache ? cache : {});
@@ -88,19 +121,7 @@ module.exports = (app, options = {
     app.link('/assets', `${basePath}/${publicDir}/assets`, options.cache ? cache : {});
 
     app.get('/info', (req, res) => {
-        const config = { locale: LOCALE, env: NODE_ENV, allowAnonymous: true };
-
-        if (API_URL) {
-            config['api'] = API_URL;
-        }
-
-        if (WEBSOCKET_URL) {
-            config['websocketUrl'] = WEBSOCKET_URL;
-        }
-
-        request(`https://crudaas.beelab.tk/configuration/${name}`, { headers: { 'User-Agent': req.userAgent } })
-            .then(data => res.json(Object.assign(config, { version, name }, JSON.parse(data))))
-            .catch(() => res.json(Object.assign(config, { version, name }, { auth: { clientId: 'demo' }})));
+        res.json(Container.parameters('info'));
     });
 
     if (options.api) {
@@ -115,7 +136,6 @@ module.exports = (app, options = {
                 req.original.body = req.body;
                 req.original.params = req.params;
                 req.original.query = req.query;
-                req.original.requester = app.requester;
                 apiMiddleware.request(req.original, res.original, next);
             } else {
                 next();
@@ -124,7 +144,6 @@ module.exports = (app, options = {
     }
 
     app.get('/', (req, res) => {
-        console.log(`${basePath}/${publicDir}/index.html`)
         const path = `${basePath}/${publicDir}/index.html`;
         try {
             fs.statSync(path);
@@ -133,4 +152,11 @@ module.exports = (app, options = {
             res.status(404).send(e);
         }
     });
+
+    const httpServer = createServer(app, [bodyParser].concat(options.httpServerPlugins || []));
+
+    httpServer.listen(NODE_PORT);
+    httpServer.on('listening', () => console.log(`🌏  Server start on port ${NODE_PORT}`));
+
+    return { httpServer, app };
 };

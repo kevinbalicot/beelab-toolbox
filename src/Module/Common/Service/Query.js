@@ -1,6 +1,6 @@
 const { MongoClient, MongoObjectID } = require.main.require('mongodb');
 
-class Requester {
+class Query {
     /**
      * @param {string} uri
      * @param {string} dbname
@@ -553,4 +553,4 @@ class Requester {
     }
 }
 
-module.exports = Requester;
+module.exports = Query;

@@ -1,4 +1,3 @@
-
 class CacheRepository {
     constructor(db, collection) {
         this.db = db;

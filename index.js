@@ -1,8 +1,6 @@
-
 module.exports = {
-    matcher: require('./src/services/matcher'),
-    request: require('./src/services/request'),
-    bootstrapServer: require('./src/server/bootstrap'),
+    request: require('./src/Module/Common/Service/Request'),
+    bootstrapServer: require('./src/Module/Server/bootstrap'),
 
-    YoutubeSearchRepository: require('./src/repostories/youtube/search'),
+    YoutubeSearchRepository: require('./src/Module/Youtube/Repository/Search'),
 };

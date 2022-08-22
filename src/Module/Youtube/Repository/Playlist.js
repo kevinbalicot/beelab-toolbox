@@ -1,5 +1,5 @@
-const request = require('./../../services/request');
-const YoutubeRepository = require('./youtube');
+const Request = require('../../Common/Service/Request');
+const YoutubeRepository = require('./Youtube');
 
 class YoutubePlaylistRepository extends YoutubeRepository {
     constructor(keys, query) {
@@ -12,7 +12,7 @@ class YoutubePlaylistRepository extends YoutubeRepository {
         return this.get(id)
             .then(query => {
                 if (!query.result) {
-                    return request(url)
+                    return Request.get(url)
                         .then(response => this._parseResponse(response, 'playlist'))
                         .then(items => this._mapPlaylistItems(items[0]))
                         .then(item => this.set(id, item))
@@ -32,7 +32,7 @@ class YoutubePlaylistRepository extends YoutubeRepository {
         return this.get(key)
             .then(query => {
                 if (!query.result) {
-                    return request(url)
+                    return Request.get(url)
                         .then(response => this._parseResponse(response, 'playlistItem'))
                         .then(items => this._mapPlaylistItems(items))
                         .then(item => this.set(key, item))
