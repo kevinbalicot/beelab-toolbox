@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/kevinbalicot/beelab-toolbox/compare/v1.0.0...v1.0.1) (2022-08-22)
+
+
+### Bug Fixes
+
+* Fix index ([a34aa65](https://github.com/kevinbalicot/beelab-toolbox/commit/a34aa65c109a814c7d03cf0397d55b4af739bc40))
+
 # 1.0.0 (2022-08-22)
 
 
