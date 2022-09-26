@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/kevinbalicot/beelab-toolbox/compare/v1.0.1...v1.0.2) (2022-09-26)
+
+
+### Bug Fixes
+
+* Fix API bootstrap ([1feca6a](https://github.com/kevinbalicot/beelab-toolbox/commit/1feca6aac3b173853fa668965d0703e084fffd0e))
+
 ## [1.0.1](https://github.com/kevinbalicot/beelab-toolbox/compare/v1.0.0...v1.0.1) (2022-08-22)
 
 
