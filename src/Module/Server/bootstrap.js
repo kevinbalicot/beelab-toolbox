@@ -124,11 +124,12 @@ module.exports = (options = {
         res.json(Container.parameters('info'));
     });
 
+    let api = null;
     if (options.api) {
         const tamiaApi = require.main.require('@tamia-web/tamia');
         const docPlugin = require.main.require('@tamia-web/doc-plugin');
 
-        const apiMiddleware = tamiaApi(options.api, { plugins: [docPlugin] });
+        api = tamiaApi(options.api, { plugins: [docPlugin] });
 
         app.use((req, res, next) => {
             if (req.url.match(/^\/api/)) {
@@ -136,7 +137,7 @@ module.exports = (options = {
                 req.original.body = req.body;
                 req.original.params = req.params;
                 req.original.query = req.query;
-                apiMiddleware.request(req.original, res.original, next);
+                api.request(req.original, res.original, next);
             } else {
                 next();
             }
@@ -158,5 +159,5 @@ module.exports = (options = {
     httpServer.listen(NODE_PORT);
     httpServer.on('listening', () => console.log(`🌏  Server start on port ${NODE_PORT}`));
 
-    return { httpServer, app };
+    return { httpServer, app, api };
 };
