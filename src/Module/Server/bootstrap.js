@@ -12,6 +12,7 @@ module.exports = (options = {
     query: false,
     localQuery: false,
     api: false,
+    apiPrefix: 'api',
     cors: null,
     publicDir: 'public',
     auth: { clientId: 'demo' },
@@ -82,8 +83,9 @@ module.exports = (options = {
     }
 
     if (options.cache) {
+        Container.set('cache', cache);
         app.use((req, res, next) => {
-            if (req.headers['if-none-match'] && req.headers['if-none-match'] === cache['ETag']) {
+            if (req.headers['if-none-match'] && req.headers['if-none-match'] == cache['ETag']) {
                 return res.status(304).send();
             }
 
@@ -126,14 +128,16 @@ module.exports = (options = {
 
     let api = null;
     if (options.api) {
+        const apiPrefix = options.apiPrefix !== undefined ? options.apiPrefix : '/api';
         const tamiaApi = require.main.require('@tamia-web/tamia');
         const docPlugin = require.main.require('@tamia-web/doc-plugin');
 
-        api = tamiaApi(options.api, { plugins: [docPlugin] });
+        api = tamiaApi(options.api, { plugins: [docPlugin(apiPrefix)] });
 
         app.use((req, res, next) => {
-            if (req.url.match(/^\/api/)) {
-                req.original.url = req.original.url.replace('/api', '');
+            const pattern = new RegExp(`^${apiPrefix}`);
+            if (pattern.test(req.url)) {
+                req.original.url = req.original.url.replace(apiPrefix, '');
                 req.original.body = req.body;
                 req.original.params = req.params;
                 req.original.query = req.query;
