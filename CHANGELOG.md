@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/kevinbalicot/beelab-toolbox/compare/v1.0.2...v1.1.0) (2022-10-11)
+
+
+### Features
+
+* Add API prefix option ([3b0bed8](https://github.com/kevinbalicot/beelab-toolbox/commit/3b0bed86c9d2ee0a7b3f16c10857ae570f8b4eb0))
+
 ## [1.0.2](https://github.com/kevinbalicot/beelab-toolbox/compare/v1.0.1...v1.0.2) (2022-09-26)
 
 
